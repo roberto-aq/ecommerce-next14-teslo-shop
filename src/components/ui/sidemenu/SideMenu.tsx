@@ -1,7 +1,9 @@
 'use client';
 
+import { logout } from '@/actions';
 import { useUIStore } from '@/store';
 import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
 	IoCloseOutline,
@@ -17,6 +19,9 @@ import {
 export const SideMenu = () => {
 	const isSideMenuOpen = useUIStore(state => state.isSideMenuOpen);
 	const closeSideMenu = useUIStore(state => state.closeSideMenu);
+
+	const { data: session } = useSession();
+	const isAuthenticated = !!session?.user;
 
 	return (
 		<div>
@@ -59,60 +64,76 @@ export const SideMenu = () => {
 						className='w-full bg-gray-50 rounded pl-10 py-1 pr-10 border-b-2 text-lg border-gray-200 focus:outline-none focus:border-blue-500 '
 					/>
 				</div>
+				{!isAuthenticated && (
+					<Link
+						href='/auth/login'
+						className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+						onClick={closeSideMenu}
+					>
+						<IoLogInOutline size={25} />
+						Ingresar
+					</Link>
+				)}
 
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoPersonOutline size={25} />
-					Perfil
-				</Link>
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoTicketOutline size={25} />
-					Ordenes
-				</Link>
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoLogInOutline size={25} />
-					Ingresar
-				</Link>
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoLogOutOutline size={25} />
-					Salir
-				</Link>
+				{isAuthenticated && (
+					<>
+						<Link
+							href='/profile'
+							className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+							onClick={closeSideMenu}
+						>
+							<IoPersonOutline size={25} />
+							Perfil
+						</Link>
+						<Link
+							href='/orders'
+							className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+						>
+							<IoTicketOutline size={25} />
+							Ordenes
+						</Link>
 
-				{/* Line Separator */}
-				<div className='w-full bg-gray-200 my-10 h-[1px]'></div>
+						<button
+							className='flex w-full items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+							onClick={async () => {
+								await logout();
+								window.location.replace('/');
+							}}
+						>
+							<IoLogOutOutline size={25} />
+							Salir
+						</button>
 
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoShirtOutline size={25} />
-					Productos
-				</Link>
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoTicketOutline size={25} />
-					Ordenes
-				</Link>
-				<Link
-					href='/'
-					className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
-				>
-					<IoPeopleOutline size={25} />
-					Usuarios
-				</Link>
+						{session?.user.role === 'admin' && (
+							<>
+								{/* Line Separator */}
+								<div className='w-full bg-gray-200 my-10 h-[1px]'></div>
+
+								<Link
+									href='/admin/products'
+									className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+								>
+									<IoShirtOutline size={25} />
+									Productos
+								</Link>
+								<Link
+									href='/admin/orders'
+									className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+								>
+									<IoTicketOutline size={25} />
+									Ordenes
+								</Link>
+								<Link
+									href='/admin/users'
+									className='flex items-center gap-3 mt-10 p-2 hover:bg-gray-100 rounded transition-all'
+								>
+									<IoPeopleOutline size={25} />
+									Usuarios
+								</Link>
+							</>
+						)}
+					</>
+				)}
 			</nav>
 		</div>
 	);

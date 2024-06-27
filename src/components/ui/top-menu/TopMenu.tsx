@@ -1,12 +1,20 @@
 'use client';
 
 import { titleFont } from '@/config/fonts';
-import { useUIStore } from '@/store';
+import { useCartStore, useUIStore } from '@/store';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { IoCartOutline, IoSearchOutline } from 'react-icons/io5';
 
 export const TopMenu = () => {
+	const [loaded, setLoaded] = useState(false);
+
 	const openSideMenu = useUIStore(state => state.openSideMenu);
+	const totalItemsCart = useCartStore(state => state.getTotalItems());
+
+	useEffect(() => {
+		setLoaded(true);
+	}, []);
 
 	return (
 		<nav className='flex px-5 justify-between w-full items-center'>
@@ -23,19 +31,19 @@ export const TopMenu = () => {
 
 			<div className='hidden sm:flex'>
 				<Link
-					href='/category/men'
+					href='/gender/men'
 					className='m-2 p-2 rounded-md hover:bg-gray-100 transition-all'
 				>
 					Hombres
 				</Link>
 				<Link
-					href='/category/women'
+					href='/gender/women'
 					className='m-2 p-2 rounded-md hover:bg-gray-100 transition-all'
 				>
 					Mujeres
 				</Link>
 				<Link
-					href='/category/kid'
+					href='/gender/kid'
 					className='m-2 p-2 rounded-md hover:bg-gray-100 transition-all'
 				>
 					Niños
@@ -46,12 +54,16 @@ export const TopMenu = () => {
 				<Link href='/search'>
 					<IoSearchOutline size={24} />
 				</Link>
-				<Link href='/cart'>
+				<Link
+					href={totalItemsCart === 0 && loaded ? '/empty' : '/cart'}
+				>
 					<div className='relative'>
 						<IoCartOutline size={24} />
-						<span className='absolute text-[11px] -top-1 -right-1.5 rounded-full font-bold bg-blue-700 text-white w-4 h-4 grid place-items-center'>
-							3
-						</span>
+						{loaded && totalItemsCart > 0 && (
+							<span className='absolute text-[11px] -top-1 -right-1.5 rounded-full font-bold bg-blue-700 text-white w-4 h-4 grid place-items-center'>
+								{totalItemsCart}
+							</span>
+						)}
 					</div>
 				</Link>
 

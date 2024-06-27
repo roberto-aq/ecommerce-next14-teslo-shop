@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { inter } from '@/config/fonts';
+import { Providers } from '@/components/providers/Providers';
 
 export const metadata: Metadata = {
-	title: 'Teslo | Shop',
+	title: {
+		template: '%s Teslo | Shop',
+		default: 'Home - Teslo | Shop',
+	},
 	description: 'Una tienda virtual de productos',
 };
 
@@ -14,7 +18,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='es'>
-			<body className={inter.className}>{children}</body>
+			<Providers>
+				<body className={inter.className}>{children}</body>
+			</Providers>
 		</html>
 	);
 }
